@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "opensuperintelligence": {
+      "url": "http://localhost:3000/api/mcp",
+      "headers": {
+        "Authorization": "Bearer osi_live_default"
+      }
+    }
+  }
+}
