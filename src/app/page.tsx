@@ -1,551 +1,514 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { 
   Cpu, 
-  Search, 
-  Box, 
-  Database, 
+  Terminal, 
+  Server, 
+  Key, 
   ShieldCheck, 
-  Layers, 
+  Check, 
+  ArrowRight, 
+  Copy, 
   CheckCircle2, 
-  XCircle,
-  TrendingDown,
-  Sparkles,
-  Film,
-  GitBranch,
-  BrainCircuit,
+  Lock, 
+  DollarSign, 
+  Zap, 
   ChevronRight,
-  ExternalLink,
-  Lock,
-  DollarSign,
-  Download,
-  Terminal,
-  Zap,
-  Star,
-  Check
+  Sparkles
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageToggle } from "@/components/shared/language-toggle";
+import { useLanguage } from "@/context/language-context";
+import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
-  const appStoreModels = [
+  const { t, language } = useLanguage();
+  const [activeTab, setActiveTab] = useState<"ts" | "py" | "curl">("ts");
+  const [copied, setCopied] = useState(false);
+
+  const codeSnippets = {
+    ts: `import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.opensuperintelligence.com/v1",
+  apiKey: process.env.OSI_API_KEY || "osi_live_default",
+});
+
+const completion = await client.chat.completions.create({
+  model: "deepseek-v4-pro", // or "kimi-k3", "qwen-2-5-coder"
+  messages: [{ role: "user", content: "Analyze sparse MoE attention kernels." }],
+});
+
+console.log(completion.choices[0].message.content);`,
+    py: `from openai import OpenAI
+import os
+
+client = OpenAI(
+    base_url="https://api.opensuperintelligence.com/v1",
+    api_key=os.environ.get("OSI_API_KEY", "osi_live_default"),
+)
+
+completion = client.chat.completions.create(
+    model="deepseek-v4-pro",
+    messages=[{"role": "user", "content": "Analyze sparse MoE attention kernels."}],
+)
+
+print(completion.choices[0].message.content)`,
+    curl: `curl https://api.opensuperintelligence.com/v1/chat/completions \\
+  -H "Authorization: Bearer osi_live_default" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "deepseek-v4-pro",
+    "messages": [
+      {"role": "user", "content": "Analyze sparse MoE attention kernels."}
+    ],
+    "stream": true
+  }'`,
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(codeSnippets[activeTab]);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const models = [
     {
       id: "deepseek-v4-pro",
       name: "DeepSeek V4 Pro",
-      developer: "DeepSeek AI",
-      category: "Frontier Reasoning & Coding",
-      rating: "4.9",
-      specs: "1.6T MoE · 131k Context",
-      price: "$0.28 / 1M tokens",
-      iconBg: "bg-blue-600",
-      icon: Cpu,
-      slug: "deepseek-v4-pro",
-      badge: "SWE-bench 51.2%"
+      provider: "DeepSeek",
+      badge: "SOTA Reasoning",
+      context: "131,072 tokens",
+      specs: "1.6T MoE (37B active) · Multi-Head Latent Attention",
+      priceIn: "$0.70 / 1M tokens",
+      priceOut: "$2.18 / 1M tokens",
+      color: "text-[#2997FF]",
+      border: "border-blue-500/20",
+      bg: "bg-blue-500/10",
     },
     {
       id: "kimi-k3",
       name: "Kimi K3 Ultra",
-      developer: "Moonshot AI",
-      category: "1M Long-Horizon Context",
-      rating: "5.0",
-      specs: "2.8T MoE · 1,000,000 Tokens",
-      price: "$1.00 / 1M tokens",
-      iconBg: "bg-emerald-600",
-      icon: Zap,
-      slug: "kimi-k3",
-      badge: "1M Needle 99.8%"
+      provider: "Moonshot AI",
+      badge: "1,000,000 Context",
+      context: "1,048,576 tokens",
+      specs: "2.8T MoE · Kimi Delta Attention (KDA) long-horizon",
+      priceIn: "$0.60 / 1M tokens",
+      priceOut: "$1.80 / 1M tokens",
+      color: "text-[#30D158]",
+      border: "border-emerald-500/20",
+      bg: "bg-emerald-500/10",
     },
     {
-      id: "wan-video",
-      name: "Wan 2.1 Sundance",
-      developer: "Alibaba Wan Team",
-      category: "1080p Cinema Video Diffusion",
-      rating: "4.8",
-      specs: "14B DiT · 24fps Anamorphic",
-      price: "Open Weights",
-      iconBg: "bg-purple-600",
-      icon: Film,
-      slug: "wan-2.1-video",
-      badge: "Cinema Scope"
+      id: "qwen-2-5-coder",
+      name: "Qwen 2.5 Coder 32B",
+      provider: "Alibaba Cloud",
+      badge: "SWE-bench 55.4%",
+      context: "131,072 tokens",
+      specs: "32B Dense · SOTA open weights coding & multi-file edit",
+      priceIn: "$0.50 / 1M tokens",
+      priceOut: "$1.40 / 1M tokens",
+      color: "text-[#BF5AF2]",
+      border: "border-purple-500/20",
+      bg: "bg-purple-500/10",
     },
     {
-      id: "meta-sam2",
-      name: "Meta Content Brain",
-      developer: "Meta AI",
-      category: "SAM 2 Video Object Memory",
-      rating: "4.9",
-      specs: "Real-time Spatiotemporal Grounding",
-      price: "Open Weights",
-      iconBg: "bg-indigo-600",
-      icon: BrainCircuit,
-      slug: "meta-content-brain",
-      badge: "Zero-Shot RAG"
-    },
-    {
-      id: "kernel-sandbox",
-      name: "Kernel.sh MicroVM",
-      developer: "Kernel Systems",
-      category: "Isolated Stealth Browser VM",
-      rating: "4.9",
-      specs: "Sub-150ms Cold Start · Anti-bot CDP",
-      price: "$0.02 / min",
-      iconBg: "bg-amber-600",
-      icon: Box,
-      slug: "sandboxes",
-      badge: "Air-Gapped"
-    },
-    {
-      id: "vllm-engine",
-      name: "vLLM Serving Engine",
-      developer: "vLLM Team (UC Berkeley)",
-      category: "High-Throughput GPU Runtime",
-      rating: "5.0",
-      specs: "PagedAttention · Continuous Batching",
-      price: "Certified Upstream",
-      iconBg: "bg-cyan-600",
-      icon: Layers,
-      slug: "harnesses",
-      badge: "3.5x Throughput"
+      id: "deepseek-v4-flash",
+      name: "DeepSeek V4.1 Flash",
+      provider: "DeepSeek",
+      badge: "Sub-200ms TTFT",
+      context: "131,072 tokens",
+      specs: "Ultra-low-latency high-throughput agentic execution",
+      priceIn: "$0.07 / 1M tokens",
+      priceOut: "$0.22 / 1M tokens",
+      color: "text-[#FF9F0A]",
+      border: "border-amber-500/20",
+      bg: "bg-amber-500/10",
     },
   ];
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-background text-foreground selection:bg-[#0071E3] selection:text-white">
-      {/* Apple Subtle Ambient Lighting */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[480px] ambient-glow pointer-events-none" />
+    <div className="min-h-screen bg-background text-foreground transition-colors selection:bg-[#0071E3] selection:text-white">
+      {/* ── Apple-Grade Header ── */}
+      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-black/60 border-b border-white/[0.08] transition-colors">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Logo />
 
-      {/* ── Apple Global Navigation Bar (48px) ── */}
-      <header className="sticky top-0 z-50 border-b border-white/[0.08] backdrop-blur-2xl bg-black/75">
-        <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
-          <Logo size="default" />
-
-          <nav className="hidden md:flex items-center gap-7 text-[13px] text-[#86868B]">
-            <Link href="#benchmarks" className="hover:text-white transition-colors">
-              Benchmarks
+          <nav className="hidden md:flex items-center gap-6 text-xs text-[#86868B] font-medium">
+            <Link href="/models" className="hover:text-foreground transition-colors">
+              {t("nav.models")}
             </Link>
-            <Link href="#app-store" className="hover:text-white transition-colors">
-              App Store
+            <Link href="/playground" className="hover:text-foreground transition-colors">
+              {t("nav.playground")}
             </Link>
-            <Link href="#sovereignty" className="hover:text-white transition-colors">
-              Data Sovereignty
+            <Link href="/cloud/clusters" className="hover:text-foreground transition-colors">
+              {t("nav.clusters")}
             </Link>
-            <Link href="/models" className="hover:text-white transition-colors">
-              Models
-            </Link>
-            <Link href="/video" className="hover:text-white transition-colors text-[#2997FF]">
-              Sundance Video
+            <Link href="/cloud/usage" className="hover:text-foreground transition-colors">
+              {t("nav.usage")}
             </Link>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <LanguageToggle />
             <ThemeToggle />
             <Link
-              href="/models"
+              href="/login"
               className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-semibold text-black bg-white hover:bg-[#E8E8ED] transition-all shadow-sm"
             >
-              <span>Console</span>
+              <span>{t("nav.console")}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
       </header>
 
-      {/* ── Apple Radical Simplicity Hero ── */}
-      <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 text-center">
-        <div className="max-w-4xl mx-auto px-6 space-y-6">
-          <span className="text-[12px] font-semibold text-[#86868B] tracking-wider uppercase block">
-            Enterprise Open-Source Infrastructure
-          </span>
+      {/* ── Hero: Radical Simplicity & Clear Positioning ── */}
+      <section className="relative pt-20 pb-16 md:pt-32 md:pb-20 text-center overflow-hidden">
+        {/* Ambient spotlight */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] bg-[#2997FF]/[0.09] blur-[140px] rounded-full pointer-events-none" />
 
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-[-0.035em] text-[#F5F5F7] leading-[1.03]">
-            Own your data.<br />
-            <span className="bg-gradient-to-b from-white via-[#F5F5F7] to-[#86868B] bg-clip-text text-transparent">
-              At a fraction of the cost.
+        <div className="max-w-4xl mx-auto px-6 space-y-6 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.10] text-[11px] font-mono uppercase tracking-wider text-[#A1A1A6]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#30D158]" />
+            <span>{t("hero.badge")}</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-[-0.04em] text-foreground leading-[1.02]">
+            {t("hero.title_1")}<br />
+            <span className="bg-gradient-to-b from-foreground via-foreground/90 to-[#86868B] bg-clip-text text-transparent">
+              {t("hero.title_2")}
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-[#86868B] font-normal leading-relaxed max-w-2xl mx-auto">
-            Replace closed APIs from OpenAI and Anthropic with sovereign DeepSeek and Kimi clusters. Same frontier intelligence. 100% data privacy. 85% lower compute spend.
+          <p className="text-base sm:text-xl text-[#86868B] font-normal leading-relaxed max-w-2xl mx-auto">
+            {t("hero.subtitle")}
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-4">
             <Link
-              href="/models"
-              className="inline-flex items-center gap-1.5 px-6 py-3 rounded-full text-sm font-semibold text-black bg-white hover:bg-[#E8E8ED] transition-all shadow-lg shadow-white/5"
+              href="/settings/api-keys"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-black bg-white hover:bg-[#E8E8ED] transition-all shadow-lg shadow-white/5"
             >
-              <span>Deploy Sovereign Cluster</span>
-              <ChevronRight className="w-4 h-4" />
+              <Key className="w-4 h-4" />
+              <span>{t("hero.cta_keys")}</span>
             </Link>
 
             <Link
-              href="#benchmarks"
-              className="inline-flex items-center gap-1.5 px-6 py-3 rounded-full text-sm font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 transition-all"
+              href="/playground"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-foreground bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 transition-all"
             >
-              <span>View Head-to-Head Benchmarks</span>
-              <ChevronRight className="w-4 h-4 text-[#86868B]" />
+              <Terminal className="w-4 h-4 text-[#2997FF]" />
+              <span>{t("hero.cta_playground")}</span>
+            </Link>
+
+            <Link
+              href="/cloud/clusters"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-[#86868B] hover:text-foreground transition-all"
+            >
+              <Server className="w-4 h-4 text-[#BF5AF2]" />
+              <span>{t("hero.cta_clusters")} →</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── The 2 Executive Convictions Strip ── */}
-      <section id="sovereignty" className="py-12 border-y border-white/[0.08] bg-[#161617]/50">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Conviction 1: Data Ownership */}
-            <div className="p-8 rounded-[24px] bg-[#161617] border border-white/[0.08] space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-[#2997FF] mb-2">
+      {/* ── Drop-In OpenAI Compatibility Card ── */}
+      <section className="py-12 max-w-4xl mx-auto px-6">
+        <div className="luxury-card rounded-2xl p-6 sm:p-8 backdrop-blur-2xl border border-white/[0.08] shadow-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/[0.06]">
+            <div>
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#FF9F0A]" />
+                <h3 className="text-sm font-semibold tracking-tight text-foreground">
+                  {t("hero.drop_in_label")}
+                </h3>
+              </div>
+              <p className="text-xs text-[#86868B] mt-1">
+                {t("hero.drop_in_sub")}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="inline-flex p-1 bg-white/[0.04] border border-white/[0.08] rounded-xl text-xs font-mono">
+                {(["ts", "py", "curl"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={cn(
+                      "px-3 py-1 rounded-lg transition-all text-xs",
+                      activeTab === tab
+                        ? "bg-white/[0.14] text-foreground font-semibold"
+                        : "text-[#86868B] hover:text-foreground"
+                    )}
+                  >
+                    {tab.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={handleCopyCode}
+                className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-[#86868B] hover:text-foreground transition-colors"
+                title="Copy Code"
+              >
+                {copied ? <Check className="w-4 h-4 text-[#30D158]" /> : <Copy className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <pre className="mt-5 p-4 rounded-xl bg-black/60 border border-white/[0.06] text-xs font-mono text-[#F4F4F6] overflow-x-auto leading-relaxed">
+            <code>{codeSnippets[activeTab]}</code>
+          </pre>
+        </div>
+      </section>
+
+      {/* ── 3 Core Executive Convictions ── */}
+      <section className="py-16 border-y border-white/[0.08] bg-[#161617]/40">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Conviction 1 */}
+            <div className="luxury-card p-6 sm:p-7 rounded-2xl border border-white/[0.08] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-[#2997FF]">
                 <Lock className="w-5 h-5" />
               </div>
-              <h3 className="text-xl font-semibold text-white tracking-tight">
-                1. 100% Data Sovereignty
+              <h3 className="text-base font-semibold text-foreground tracking-tight">
+                {t("value.sovereignty.title")}
               </h3>
-              <p className="text-sm text-[#86868B] leading-relaxed">
-                Your enterprise weights and prompts run entirely in your private cloud or air-gapped on-premise hardware. Zero telemetry. Zero logs retained. Zero compliance risk.
+              <p className="text-xs text-[#86868B] leading-relaxed">
+                {t("value.sovereignty.desc")}
               </p>
-              <div className="flex items-center gap-2 pt-2 text-xs font-semibold text-[#2997FF]">
-                <Check className="w-4 h-4" />
-                <span>Certified for SOC 2, HIPAA, and GDPR air-gap deployments</span>
+              <div className="flex items-center gap-1.5 pt-2 text-[11px] font-mono text-[#2997FF]">
+                <Check className="w-3.5 h-3.5 shrink-0" />
+                <span>{t("value.sovereignty.tag")}</span>
               </div>
             </div>
 
-            {/* Conviction 2: 85% Cost Reduction */}
-            <div className="p-8 rounded-[24px] bg-[#161617] border border-white/[0.08] space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[#30D158] mb-2">
+            {/* Conviction 2 */}
+            <div className="luxury-card p-6 sm:p-7 rounded-2xl border border-white/[0.08] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[#30D158]">
                 <DollarSign className="w-5 h-5" />
               </div>
-              <h3 className="text-xl font-semibold text-white tracking-tight">
-                2. A Fraction of the Cost
+              <h3 className="text-base font-semibold text-foreground tracking-tight">
+                {t("value.cost.title")}
               </h3>
-              <p className="text-sm text-[#86868B] leading-relaxed">
-                DeepSeek V4 and Kimi K3 deliver matching or superior coding and reasoning performance to GPT-4o and Claude 3.7 at up to <strong>91% lower token pricing</strong>.
+              <p className="text-xs text-[#86868B] leading-relaxed">
+                {t("value.cost.desc")}
               </p>
-              <div className="flex items-center gap-2 pt-2 text-xs font-semibold text-[#30D158]">
-                <Check className="w-4 h-4" />
-                <span>$0.28 vs $15.00 per million input tokens</span>
+              <div className="flex items-center gap-1.5 pt-2 text-[11px] font-mono text-[#30D158]">
+                <Check className="w-3.5 h-3.5 shrink-0" />
+                <span>{t("value.cost.tag")}</span>
+              </div>
+            </div>
+
+            {/* Conviction 3 */}
+            <div className="luxury-card p-6 sm:p-7 rounded-2xl border border-white/[0.08] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[#BF5AF2]">
+                <Server className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-semibold text-foreground tracking-tight">
+                {t("value.dedicated.title")}
+              </h3>
+              <p className="text-xs text-[#86868B] leading-relaxed">
+                {t("value.dedicated.desc")}
+              </p>
+              <div className="flex items-center gap-1.5 pt-2 text-[11px] font-mono text-[#BF5AF2]">
+                <Check className="w-3.5 h-3.5 shrink-0" />
+                <span>{t("value.dedicated.tag")}</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Head-to-Head Benchmarks: DeepSeek & Kimi vs OpenAI & Claude ── */}
-      <section id="benchmarks" className="py-24 border-b border-white/[0.08]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-            <span className="text-[12px] font-semibold text-[#2997FF] tracking-wider uppercase block">
-              Direct Benchmark Comparison
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-[#F5F5F7]">
-              Open Weights vs Closed APIs
-            </h2>
-            <p className="text-sm sm:text-base text-[#86868B]">
-              Real independent benchmark results comparing frontier open models to the leading closed proprietary APIs.
-            </p>
-          </div>
+      {/* ── Head-to-Head Benchmarks Table ── */}
+      <section className="py-20 max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
+          <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#2997FF]">
+            {t("benchmarks.badge")}
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
+            {t("benchmarks.title")}
+          </h2>
+          <p className="text-xs sm:text-sm text-[#86868B]">
+            {t("benchmarks.subtitle")}
+          </p>
+        </div>
 
-          {/* Apple-Style Comparison Matrix */}
-          <div className="overflow-x-auto rounded-[28px] border border-white/[0.08] bg-[#161617] shadow-2xl">
-            <table className="w-full text-left text-sm font-sans border-collapse">
-              <thead>
-                <tr className="border-b border-white/[0.08] bg-white/[0.02]">
-                  <th className="p-4 sm:p-5 text-[#86868B] font-medium text-xs uppercase tracking-wider">Dimension</th>
-                  <th className="p-4 sm:p-5 text-[#2997FF] font-semibold text-xs uppercase tracking-wider bg-blue-500/[0.04]">
-                    DeepSeek V4 Pro
-                  </th>
-                  <th className="p-4 sm:p-5 text-[#30D158] font-semibold text-xs uppercase tracking-wider bg-emerald-500/[0.04]">
-                    Kimi K3 Ultra
-                  </th>
-                  <th className="p-4 sm:p-5 text-[#86868B] font-medium text-xs uppercase tracking-wider">
-                    OpenAI GPT-4o
-                  </th>
-                  <th className="p-4 sm:p-5 text-[#86868B] font-medium text-xs uppercase tracking-wider">
-                    Claude 3.7 Sonnet
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.06]">
-                {/* Row 1: SWE-bench Verified */}
-                <tr>
-                  <td className="p-4 sm:p-5 text-white font-medium">
-                    Software Engineering (SWE-bench)
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#2997FF] font-semibold bg-blue-500/[0.04]">
-                    51.2% (Top Tier)
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-semibold bg-emerald-500/[0.04]">
-                    48.9%
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#86868B]">
-                    38.8%
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#F5F5F7]">
-                    51.0%
-                  </td>
-                </tr>
+        <div className="overflow-x-auto rounded-2xl border border-white/[0.08] luxury-card shadow-2xl">
+          <table className="w-full text-left text-xs font-mono border-collapse">
+            <thead>
+              <tr className="border-b border-white/[0.08] bg-white/[0.02] text-[#86868B] text-[10px] uppercase">
+                <th className="p-4">{t("benchmarks.col_model")}</th>
+                <th className="p-4">{t("benchmarks.col_context")}</th>
+                <th className="p-4">{t("benchmarks.col_swe")}</th>
+                <th className="p-4 text-right">{t("benchmarks.col_input")}</th>
+                <th className="p-4 text-right">{t("benchmarks.col_output")}</th>
+                <th className="p-4 text-center">{t("benchmarks.col_sovereign")}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/[0.04]">
+              {/* DeepSeek V4 Pro */}
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-semibold text-[#2997FF] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#2997FF]" />
+                  <span>DeepSeek V4 Pro</span>
+                </td>
+                <td className="p-4 text-foreground">131,072</td>
+                <td className="p-4 text-[#30D158] font-bold">51.2% (SOTA)</td>
+                <td className="p-4 text-right text-foreground font-bold">$0.70</td>
+                <td className="p-4 text-right text-foreground">$2.18</td>
+                <td className="p-4 text-center">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Yes (H100)
+                  </span>
+                </td>
+              </tr>
 
-                {/* Row 2: Math & Reasoning */}
-                <tr>
-                  <td className="p-4 sm:p-5 text-white font-medium">
-                    Advanced Reasoning (MATH 500 / AIME)
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#2997FF] font-semibold bg-blue-500/[0.04]">
-                    96.8%
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-semibold bg-emerald-500/[0.04]">
-                    95.2%
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#86868B]">
-                    92.4%
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#F5F5F7]">
-                    92.4%
-                  </td>
-                </tr>
+              {/* Kimi K3 */}
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-semibold text-[#30D158] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#30D158]" />
+                  <span>Kimi K3 Ultra</span>
+                </td>
+                <td className="p-4 text-[#30D158] font-bold">1,048,576 (1M)</td>
+                <td className="p-4 text-foreground">48.7%</td>
+                <td className="p-4 text-right text-foreground font-bold">$0.60</td>
+                <td className="p-4 text-right text-foreground">$1.80</td>
+                <td className="p-4 text-center">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Yes (H100)
+                  </span>
+                </td>
+              </tr>
 
-                {/* Row 3: Context Window */}
-                <tr>
-                  <td className="p-4 sm:p-5 text-white font-medium">
-                    Context Window Horizon
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#F5F5F7] bg-blue-500/[0.04]">
-                    131,072 tokens
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-semibold bg-emerald-500/[0.04]">
-                    1,000,000 tokens (1M)
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#86868B]">
-                    128,000 tokens
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#86868B]">
-                    200,000 tokens
-                  </td>
-                </tr>
+              {/* Qwen 2.5 Coder */}
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-semibold text-[#BF5AF2] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#BF5AF2]" />
+                  <span>Qwen 2.5 Coder 32B</span>
+                </td>
+                <td className="p-4 text-foreground">131,072</td>
+                <td className="p-4 text-[#30D158] font-bold">55.4% (Highest)</td>
+                <td className="p-4 text-right text-foreground font-bold">$0.50</td>
+                <td className="p-4 text-right text-foreground">$1.40</td>
+                <td className="p-4 text-center">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Yes (A100)
+                  </span>
+                </td>
+              </tr>
 
-                {/* Row 4: Input Pricing */}
-                <tr>
-                  <td className="p-4 sm:p-5 text-white font-medium">
-                    Input Cost / 1M Tokens
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#2997FF] font-bold bg-blue-500/[0.04]">
-                    $0.28
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-bold bg-emerald-500/[0.04]">
-                    $1.00
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A] font-semibold">
-                    $2.50 (9x higher)
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A] font-semibold">
-                    $3.00 (11x higher)
-                  </td>
-                </tr>
+              {/* Closed APIs (for comparison) */}
+              <tr className="hover:bg-white/[0.02] transition-colors text-[#86868B] bg-white/[0.01]">
+                <td className="p-4">OpenAI GPT-4o</td>
+                <td className="p-4">128,000</td>
+                <td className="p-4">38.8%</td>
+                <td className="p-4 text-right text-[#FF453A]">$2.50 (+257%)</td>
+                <td className="p-4 text-right text-[#FF453A]">$10.00</td>
+                <td className="p-4 text-center text-[#86868B]">No (Closed)</td>
+              </tr>
 
-                {/* Row 5: Output Pricing */}
-                <tr>
-                  <td className="p-4 sm:p-5 text-white font-medium">
-                    Output Cost / 1M Tokens
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#2997FF] font-bold bg-blue-500/[0.04]">
-                    $1.40
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-bold bg-emerald-500/[0.04]">
-                    $5.00
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A] font-semibold">
-                    $10.00 (7x higher)
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A] font-semibold">
-                    $15.00 (10x higher)
-                  </td>
-                </tr>
-
-                {/* Row 6: Monthly Spend for 100M Tokens */}
-                <tr className="bg-white/[0.03]">
-                  <td className="p-4 sm:p-5 text-white font-semibold">
-                    Monthly TCO (100M Tokens/mo)
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#2997FF] font-bold text-base bg-blue-500/[0.08]">
-                    $168 / mo
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-bold text-base bg-emerald-500/[0.08]">
-                    $300 / mo
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A] font-semibold text-base">
-                    $2,500 / mo
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A] font-semibold text-base">
-                    $3,000 / mo
-                  </td>
-                </tr>
-
-                {/* Row 7: Data Sovereignty */}
-                <tr>
-                  <td className="p-4 sm:p-5 text-white font-medium">
-                    Data Sovereignty & Privacy
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-medium bg-blue-500/[0.04]">
-                    100% Private VPC / Air-Gap
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#30D158] font-medium bg-emerald-500/[0.04]">
-                    100% Private VPC / Air-Gap
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A]">
-                    Shared Hyperscaler Cloud
-                  </td>
-                  <td className="p-4 sm:p-5 text-[#FF453A]">
-                    Shared Hyperscaler Cloud
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              <tr className="hover:bg-white/[0.02] transition-colors text-[#86868B] bg-white/[0.01]">
+                <td className="p-4">Anthropic Claude 3.5 Sonnet</td>
+                <td className="p-4">200,000</td>
+                <td className="p-4">49.2%</td>
+                <td className="p-4 text-right text-[#FF453A]">$3.00 (+328%)</td>
+                <td className="p-4 text-right text-[#FF453A]">$15.00</td>
+                <td className="p-4 text-center text-[#86868B]">No (Closed)</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      {/* ── Apple App Store Style: Curated Open Models & Services ── */}
-      <section id="app-store" className="py-24 border-b border-white/[0.08]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+      {/* ── Frontier Models Catalog Grid ── */}
+      <section className="py-16 border-t border-white/[0.08] bg-[#161617]/30">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
-              <span className="text-[12px] font-semibold text-[#86868B] tracking-wider uppercase block mb-1">
-                Open-Source App Store
+              <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#2997FF]">
+                Production Endpoints
               </span>
-              <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#F5F5F7]">
-                Featured Models & Services
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mt-1">
+                Verified Frontier Foundation Models
               </h2>
             </div>
             <Link
               href="/models"
-              className="text-sm font-semibold text-[#2997FF] hover:underline flex items-center gap-1"
+              className="text-xs text-[#2997FF] hover:underline font-mono inline-flex items-center gap-1"
             >
-              <span>Browse All Models</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>View All Verified Models</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* App Store List Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {appStoreModels.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.id}
-                  className="luxury-card rounded-[22px] p-5 flex items-center justify-between gap-4 group hover:scale-[1.01] transition-all duration-300"
-                >
-                  <div className="flex items-center gap-4 min-w-0">
-                    {/* App Icon */}
-                    <div className={`w-14 h-14 rounded-[16px] ${item.iconBg} flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 transition-transform`}>
-                      <Icon className="w-7 h-7 text-white" />
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {models.map((m) => (
+              <div
+                key={m.id}
+                className="luxury-card rounded-2xl p-6 border border-white/[0.08] hover:border-white/[0.16] transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs text-[#86868B] font-mono">{m.provider}</span>
+                    <span className={cn("text-[10px] font-mono px-2 py-0.5 rounded border", m.bg, m.color, m.border)}>
+                      {m.badge}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground tracking-tight">
+                    {m.name}
+                  </h3>
+                  <p className="text-xs text-[#86868B] mt-1.5 leading-relaxed">
+                    {m.specs}
+                  </p>
+                </div>
 
-                    {/* Metadata */}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-[15px] text-white tracking-tight truncate group-hover:text-[#2997FF] transition-colors">
-                          {item.name}
-                        </h3>
-                      </div>
-                      <p className="text-xs text-[#86868B] truncate mt-0.5">
-                        {item.developer} · {item.category}
-                      </p>
-                      <div className="flex items-center gap-2 text-[11px] text-[#A1A1A6] mt-1.5">
-                        <span className="text-[#FF9F0A] flex items-center gap-0.5 font-medium">
-                          <Star className="w-3 h-3 fill-[#FF9F0A]" />
-                          {item.rating}
-                        </span>
-                        <span>•</span>
-                        <span className="font-medium text-white">{item.price}</span>
-                      </div>
-                    </div>
+                <div className="pt-6 mt-6 border-t border-white/[0.06] flex items-center justify-between">
+                  <div className="font-mono text-xs">
+                    <span className="text-foreground font-semibold">{m.priceIn}</span>
+                    <span className="text-[#86868B] text-[10px] block">input tokens</span>
                   </div>
 
-                  {/* App Store "GET / DEPLOY" Pill Button */}
                   <Link
-                    href={`/models/${item.slug}`}
-                    className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-semibold text-[#2997FF] bg-white/[0.08] hover:bg-white hover:text-black transition-all shrink-0 uppercase tracking-wider"
+                    href={`/playground?model=${m.id}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-xs font-medium text-foreground transition-all"
                   >
-                    GET
+                    <span>Run in Playground</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── Executive CTA Section ── */}
-      <section className="py-24 text-center">
-        <div className="max-w-3xl mx-auto px-6 space-y-6">
-          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-white">
-            Ready to reclaim your AI budget?
-          </h2>
-          <p className="text-base text-[#86868B] leading-relaxed max-w-xl mx-auto">
-            Talk to an infrastructure architect. We will model your exact monthly token usage and show you how much you save on sovereign DeepSeek and Kimi clusters.
-          </p>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/models"
-              className="inline-flex items-center gap-1.5 px-6 py-3.5 rounded-full text-sm font-semibold text-black bg-white hover:bg-[#E8E8ED] transition-all shadow-lg"
-            >
-              <span>Launch Enterprise Console</span>
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/video"
-              className="inline-flex items-center gap-1.5 px-6 py-3.5 rounded-full text-sm font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 transition-all"
-            >
-              <span>Try Sundance Video Studio</span>
-              <ChevronRight className="w-4 h-4 text-[#86868B]" />
-            </Link>
-          </div>
+      {/* ── Bottom Call to Action ── */}
+      <section className="py-24 text-center max-w-4xl mx-auto px-6 space-y-6">
+        <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-foreground">
+          {t("cta.title")}
+        </h2>
+        <p className="text-sm sm:text-base text-[#86868B] max-w-xl mx-auto">
+          {t("cta.subtitle")}
+        </p>
+        <div className="pt-2">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-black bg-white hover:bg-[#E8E8ED] transition-all shadow-xl shadow-white/10"
+          >
+            <span>{t("cta.button")}</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
 
-      {/* ── Apple Clean Global Footer ── */}
-      <footer className="py-12 border-t border-white/[0.08] text-xs text-[#86868B]">
-        <div className="max-w-5xl mx-auto px-6 space-y-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <Logo size="sm" showWordmark={true} />
-              <span>·</span>
-              <span>The Sovereign Open-Source AI Infrastructure</span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-6">
-              <Link href="/models" className="hover:text-white transition-colors">
-                Models
-              </Link>
-              <Link href="/video" className="hover:text-white transition-colors">
-                Sundance Video
-              </Link>
-              <Link href="/repos" className="hover:text-white transition-colors">
-                Repositories
-              </Link>
-              <Link href="/stacks" className="hover:text-white transition-colors">
-                Agentic Stacks
-              </Link>
-              <Link href="/settings/api-keys" className="hover:text-white transition-colors">
-                API Keys
-              </Link>
-              <Link href="/settings/usage" className="hover:text-white transition-colors">
-                Ledger
-              </Link>
-            </div>
-          </div>
-
-          <div className="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#86868B]">
-            <div>
-              © 2026 OpenSuperIntelligence. An <strong className="text-white font-medium">Arcane Echos Technologies SAS</strong> product. All rights reserved.
-            </div>
-            <div className="flex items-center gap-4">
-              <span>100% Data Sovereignty</span>
-              <span>•</span>
-              <span>Enterprise SLA</span>
-              <span>•</span>
-              <span>Air-Gapped Compliance</span>
-            </div>
-          </div>
-        </div>
+      {/* ── Global Footer ── */}
+      <footer className="border-t border-white/[0.08] py-8 text-center text-xs text-[#86868B]">
+        <p>{t("cta.footer")}</p>
       </footer>
     </div>
   );

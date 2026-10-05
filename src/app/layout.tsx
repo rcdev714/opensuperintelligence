@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.ico" },
 };
 
+import { LanguageProvider } from "@/context/language-context";
+
 export default function RootLayout({
   children,
 }: {
@@ -31,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full dark" suppressHydrationWarning>
       <body className="min-h-full flex flex-col antialiased selection:bg-[#0071E3] selection:text-white transition-colors duration-200">
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
