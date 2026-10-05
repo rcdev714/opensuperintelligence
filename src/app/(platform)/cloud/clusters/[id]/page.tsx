@@ -22,10 +22,6 @@ import {
 } from "lucide-react"
 import { ClusterStatus, DeploymentStatus } from "@/types/database"
 
-export async function generateStaticParams() {
-  const clusters = await getClusters()
-  return clusters.map((c) => ({ id: c.id }))
-}
 
 interface ClusterDetailPageProps {
   params: Promise<{

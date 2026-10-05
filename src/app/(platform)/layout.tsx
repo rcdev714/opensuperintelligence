@@ -2,6 +2,9 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { CommandPalette } from "@/components/layout/command-palette";
 
+// All platform routes read from Supabase at request time — never statically generated.
+export const dynamic = "force-dynamic";
+
 export default function PlatformLayout({
   children,
 }: {
