@@ -302,23 +302,53 @@ function generateDailyUsage(): UsageDailySummary[] {
   return summaries;
 }
 
+import { createServerClient } from "@/lib/supabase/server";
+
 export const SEED_DAILY_USAGE = generateDailyUsage();
 
 // ─── Data Accessors ──────────────────────────────────────────────────
 
-export function getClusters(): Cluster[] {
+export async function getClusters(): Promise<Cluster[]> {
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase.from("clusters").select("*").order("created_at", { ascending: true });
+    if (!error && data && data.length > 0) return data as Cluster[];
+  } catch {
+    // fallback
+  }
   return SEED_CLUSTERS;
 }
 
-export function getClusterById(id: string): Cluster | undefined {
+export async function getClusterById(id: string): Promise<Cluster | undefined> {
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase.from("clusters").select("*").eq("id", id).maybeSingle();
+    if (!error && data) return data as Cluster;
+  } catch {
+    // fallback
+  }
   return SEED_CLUSTERS.find((c) => c.id === id);
 }
 
-export function getDeployments(): Deployment[] {
+export async function getDeployments(): Promise<Deployment[]> {
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase.from("deployments").select("*").order("created_at", { ascending: true });
+    if (!error && data && data.length > 0) return data as Deployment[];
+  } catch {
+    // fallback
+  }
   return SEED_DEPLOYMENTS;
 }
 
-export function getDeploymentsByCluster(clusterId: string): Deployment[] {
+export async function getDeploymentsByCluster(clusterId: string): Promise<Deployment[]> {
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase.from("deployments").select("*").eq("cluster_id", clusterId);
+    if (!error && data && data.length > 0) return data as Deployment[];
+  } catch {
+    // fallback
+  }
   return SEED_DEPLOYMENTS.filter((d) => d.cluster_id === clusterId);
 }
 

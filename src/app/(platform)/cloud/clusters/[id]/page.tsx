@@ -23,7 +23,7 @@ import {
 import { ClusterStatus, DeploymentStatus } from "@/types/database"
 
 export async function generateStaticParams() {
-  const clusters = getClusters()
+  const clusters = await getClusters()
   return clusters.map((c) => ({ id: c.id }))
 }
 
@@ -55,13 +55,13 @@ function getStatusColor(status: ClusterStatus | DeploymentStatus) {
 
 export default async function ClusterDetailPage({ params }: ClusterDetailPageProps) {
   const { id } = await params
-  const cluster = getClusterById(id)
+  const cluster = await getClusterById(id)
 
   if (!cluster) {
     notFound()
   }
 
-  const deployments = getDeploymentsByCluster(cluster.id)
+  const deployments = await getDeploymentsByCluster(cluster.id)
 
   return (
     <div className="space-y-8 pb-12">

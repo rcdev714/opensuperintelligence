@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, BarChart3, User, Sparkles } from "lucide-react";
+import { Search, BarChart3, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { UserNav } from "@/components/layout/user-nav";
 
 export function Header() {
   const pathname = usePathname();
@@ -53,12 +54,7 @@ export function Header() {
           <span className="hidden sm:inline">Usage</span>
         </Link>
         <ThemeToggle />
-        <Link 
-          href="/settings" 
-          className="h-7 w-7 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center cursor-pointer hover:bg-white/[0.12] transition-colors"
-        >
-          <User className="h-3.5 w-3.5 text-[#86868B]" />
-        </Link>
+        <UserNav />
       </div>
     </header>
   );
