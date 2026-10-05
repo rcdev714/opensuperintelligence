@@ -8,17 +8,17 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    // Check saved theme or preference
-    const saved = localStorage.getItem("osi-theme") as "light" | "dark" | null;
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.classList.remove("light", "dark");
-      document.documentElement.classList.add(saved);
-    } else {
-      // Default to dark
-      document.documentElement.classList.add("dark");
-    }
+    requestAnimationFrame(() => {
+      setMounted(true);
+      const saved = localStorage.getItem("osi-theme") as "light" | "dark" | null;
+      if (saved) {
+        setTheme(saved);
+        document.documentElement.classList.remove("light", "dark");
+        document.documentElement.classList.add(saved);
+      } else {
+        document.documentElement.classList.add("dark");
+      }
+    });
   }, []);
 
   const toggleTheme = () => {

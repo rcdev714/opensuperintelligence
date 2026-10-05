@@ -161,16 +161,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
 
   useEffect(() => {
-    const saved = localStorage.getItem("osi_lang") as Language;
-    if (saved === "en" || saved === "es") {
-      setLanguageState(saved);
-    } else {
-      // Auto detect Spanish if browser language starts with 'es'
-      const browserLang = navigator.language?.toLowerCase();
-      if (browserLang.startsWith("es")) {
-        setLanguageState("es");
+    requestAnimationFrame(() => {
+      const saved = localStorage.getItem("osi_lang") as Language;
+      if (saved === "en" || saved === "es") {
+        setLanguageState(saved);
+      } else {
+        // Auto detect Spanish if browser language starts with 'es'
+        const browserLang = navigator.language?.toLowerCase();
+        if (browserLang?.startsWith("es")) {
+          setLanguageState("es");
+        }
       }
-    }
+    });
   }, []);
 
   const setLanguage = (lang: Language) => {
